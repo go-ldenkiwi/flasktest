@@ -1,8 +1,11 @@
 - hosts: all
   become: true
   tasks: 
+     - name: delete old deployment
+       command: /usr/local/bin/kubectl delete -f /home/pipebox/Deployment.yml
+     - name: delete old service
+       command: /usr/local/bin/kubectl delete -f /home/pipebox/Service.yml
      - name: create new deployment
-       command: kubectl apply -f /home/pipebox/playbooks/Deployment.yml
+       command: /usr/local/bin/kubectl apply -f /home/pipebox/Deployment.yml
      - name: create new service
-       command: kubectl apply -f /home/pipebox/playbooks/Service.yml
- 
+       command: /usr/local/bin/kubectl apply -f /home/pipebox/Service.yml
