@@ -1,3 +1,0 @@
-hello
-bye
-added for test
