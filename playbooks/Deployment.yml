@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: deployment
+spec:
+   replicas: 2
+   selector:     
+    matchLabels:
+     app: deployment
+   template:
+      metadata:
+        labels:
+          app: webapp
+      spec:
+       containers:
+        - name: webapp
+          image: goldenkiwi1324/web-pipe-line:lastest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 5000
+        
+        - name: mariadb
+          image: mariadb:latest
+          imagePullPolicy: Always
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: admin
+          ports:
+            - containerPort: 3306
