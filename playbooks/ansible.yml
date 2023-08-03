@@ -32,15 +32,19 @@
       register: pod_names
       ignore_errors: true
 
-    - name: Copy files to running MariaDB containers of multiple Pods
-      command: kubectl cp /home/ubuntu/ymlfiles/dbschema/flector/{{ item }} {{ pod_name }}:/var/lib/mysql/flector/{{ item }} -c mariadb
-      loop: "{{ files_to_copy }}"
+    - hosts: node
       vars:
-        pod_name: "{{ item }}"
-      with_items:
-        - db.opt
-        - flower.frm
-        - flower.ibd
-        - song.frm
-        - song.ibd
-      when: pod_names is succeeded
+        files_to_copy:
+          - db.opt
+          - flower.frm
+          - flower.ibd
+          - song.frm
+          - song.ibd
+
+      tasks:
+        - name: Copy files to running MariaDB containers of multiple Pods
+          command: kubectl cp /home/ubuntu/ymlfiles/dbschema/flector/{{ item }} {{ pod_name }}:/var/lib/mysql/flector/{{ item }} -c mariadb
+          loop: "{{ files_to_copy }}"
+          vars:
+            pod_name: "{{ item }}"
+          when: pod_names is succeeded
