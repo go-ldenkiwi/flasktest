@@ -1,11 +1,46 @@
 - hosts: all
   become: true
-  tasks: 
-     - name: delete old deployment
-       command: kubectl delete -f /home/ubuntu/ymlfiles/Deployment.yml
-     - name: delete old service
-       command: kubectl delete -f /home/ubuntu/ymlfiles/Service.yml
-     - name: create new deployment
-       command: kubectl apply -f /home/ubuntu/ymlfiles/Deployment.yml
-     - name: create new service
-       command: kubectl apply -f /home/ubuntu/ymlfiles/Service.yml
+  tasks:
+
+
+    - name: Copy files from Ansible server
+      copy:
+        src: /home/pipebox/playbooks
+        dest: /home/ubuntu/ymlfiles/
+      become: true
+      
+    - name: Delete old deployment
+      command: kubectl delete -f /home/ubuntu/ymlfiles/Deployment.yml
+      ignore_errors: true
+
+    - name: Delete old service
+      command: kubectl delete -f /home/ubuntu/ymlfiles/Service.yml
+      ignore_errors: true
+
+    - name: Pull Docker image from DockerHub
+      command: docker pull goldenkiwi1324/web-pipe-line:latest
+      ignore_errors: true
+
+    - name: Create new deployment
+      command: kubectl apply -f /home/ubuntu/ymlfiles/Deployment.yml
+
+    - name: Create new service
+      command: kubectl apply -f /home/ubuntu/ymlfiles/Service.yml
+
+    - name: Get the Pod names
+      shell: kubectl get pods -l app=deployment -o jsonpath='{.items[*].metadata.name}'
+      register: pod_names
+      ignore_errors: true
+
+    - name: Copy files to running mariaDB containers of multiple Pods
+      command: kubectl cp /home/ubuntu/ymlfiles/dbschema/flector/{{ item }} {{ pod_name }}:/var/lib/mysql/flector/{{ item }} -c mariadb
+      loop: "{{ pod_names.stdout.split() }}"
+      vars:
+        pod_name: "{{ item }}"
+      with_items:
+        - db.opt
+        - flower.frm
+        - flower.ibd
+        - song.frm
+        - song.ibd
+      when: pod_names is succeeded
