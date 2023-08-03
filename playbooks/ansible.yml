@@ -27,24 +27,15 @@
     - name: Create new service
       command: kubectl apply -f /home/ubuntu/ymlfiles/Service.yml
 
-    - name: Get the Pod names
-      shell: kubectl get pods -l app=deployment -o jsonpath='{.items[*].metadata.name}'
+    - name: Get pod names
+      shell: kubectl get pods -l app=mariadb -o jsonpath='{.items[*].metadata.name}'
       register: pod_names
-      ignore_errors: true
 
-    - hosts: node
-      vars:
-        files_to_copy:
-          - db.opt
-          - flower.frm
-          - flower.ibd
-          - song.frm
-          - song.ibd
-
-      tasks:
-        - name: Copy files to running MariaDB containers of multiple Pods
-          command: kubectl cp /home/ubuntu/ymlfiles/dbschema/flector/{{ item }} {{ pod_name }}:/var/lib/mysql/flector/{{ item }} -c mariadb
-          loop: "{{ files_to_copy }}"
-          vars:
-            pod_name: "{{ item }}"
-          when: pod_names is succeeded
+    - name: Rename pods
+      shell: |
+        i=1
+        for pod in {{ pod_names.stdout | from_json | join(' ') }}; do
+          new_name="deployment-$i"
+          kubectl rename pod "$pod" "$new_name"
+          ((i=i+1))
+        done
