@@ -9,4 +9,4 @@ spec:
       port: 8000    #서비스 포트
       nodePort: 30080    # 노드의 30080으로 들어오면 서비스의 8000으로 전달
       targetPort: 5000 3306    #컨테이너 노드
-  type: LoadBalancer        
+  type: NodePort        
