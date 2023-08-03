@@ -26,7 +26,3 @@
     - name: Create new service
       command: kubectl apply -f /home/ubuntu/ymlfiles/Service.yml
       become: true
-
-    - name: Copy files to mariadb containers
-      shell: kubectl get pods -l app=mariadb -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep -E 'deployment-[0-9]+' | xargs -I {} kubectl cp /home/ubuntu/ymlfiles/dbschema/flector {}:/var/lib/mysql/flector
-      become: true
