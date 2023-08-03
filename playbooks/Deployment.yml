@@ -18,7 +18,7 @@ spec:
         ports:
         - containerPort: 5000
       - name: mariadb
-        image: mariadb:latest
+        image: goldenkiwi1324/mymariadb:latest
         env:
           - name: MYSQL_ROOT_PASSWORD
             value: zldnl88
