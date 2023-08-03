@@ -1,24 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-   name: deployment
+  name: deployment
 spec:
-   replicas: 2
-   selector:     
+  replicas: 2
+  selector:
     matchLabels:
-     app: deployment
-   template:
-      metadata:
-        labels:
-          app: webapp
-      spec:
-       containers:
+      app: deployment
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
         - name: webapp
           image: goldenkiwi1324/web-pipe-line:lastest
           imagePullPolicy: Always
           ports:
-          - containerPort: 5000
-        
+            - containerPort: 5000
         - name: mariadb
           image: mariadb:latest
           imagePullPolicy: Always
@@ -27,3 +26,9 @@ spec:
               value: admin
           ports:
             - containerPort: 3306
+
+
+
+
+
+
