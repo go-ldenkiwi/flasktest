@@ -13,16 +13,16 @@ spec:
         app: webapp
     spec:
       containers:
-      - name: webapp
-        image: goldenkiwi1324/web-pipe-line:latest
-        ports:
-        - containerPort: 5000
-      - name: mariadb
-        image: mariadb
-        env:
-          - name: MYSQL_ROOT_PASSWORD
-            value: zldnl88
-          - name: MYSQL_DATABASE
-            value: flector
-        ports:
-        - containerPort: 3306
+        - name: webapp
+          image: goldenkiwi1324/web-pipe-line:latest
+          ports:
+            - containerPort: 5000
+        - name: mariadb
+          image: mariadb
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: zldnl88
+            - name: MYSQL_DATABASE
+              value: flector
+          ports:
+            - containerPort: 3306
