@@ -10,10 +10,12 @@
     - name: Delete old deployment
       command: kubectl delete -f /home/ubuntu/ymlfiles/Deployment.yml
       become: true
+      ignore_errors: true
 
     - name: Delete old service
       command: kubectl delete -f /home/ubuntu/ymlfiles/Service.yml
       become: true
+      ignore_errors: true
 
     - name: Pull Docker image from DockerHub
       command: docker pull goldenkiwi1324/web-pipe-line:latest
