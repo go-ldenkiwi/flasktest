@@ -8,11 +8,11 @@
       become: true
 
     - name: Delete old deployment
-      command: kubectl delete deployment deployment-1 deployment-2 --ignore-not-found=true
+      command: kubectl delete -f /home/ubuntu/ymlfiles/Deployment.yml
       become: true
 
     - name: Delete old service
-      command: kubectl delete service my-service --ignore-not-found=true
+      command: kubectl delete-f /home/ubuntu/ymlfiles/Service.yml
       become: true
 
     - name: Pull Docker image from DockerHub
