@@ -12,7 +12,7 @@
       become: true
 
     - name: Delete old service
-      command: kubectl delete-f /home/ubuntu/ymlfiles/Service.yml
+      command: kubectl delete -f /home/ubuntu/ymlfiles/Service.yml
       become: true
 
     - name: Pull Docker image from DockerHub
