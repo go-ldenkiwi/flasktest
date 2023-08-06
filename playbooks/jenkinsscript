@@ -1,0 +1,40 @@
+node{
+    
+    stage('Git checkout'){
+        git branch: 'main', url: 'https://github.com/go-ldenkiwi/flasktest.git'
+    }
+    
+    stage('Sending files to Ansible server through ssh'){
+        sshagent(['Ansible']) {
+            sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110'
+            sh 'scp -r /var/lib/jenkins/workspace/web-pipe-line/* ec2-user@172.31.5.110:/home/pipebox'
+        }
+    }
+    
+    stage('Building docker image'){
+        sshagent(['Ansible']) {
+            sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker build -t $JOB_NAME:v1.$BUILD_ID /home/pipebox'
+            sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker image tag $JOB_NAME:v1.$BUILD_ID goldenkiwi1324/$JOB_NAME:v1.$BUILD_ID '
+            sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker image tag $JOB_NAME:v1.$BUILD_ID goldenkiwi1324/$JOB_NAME:latest '
+        }
+    }
+    
+    stage('Pushing docker image to dockerhub'){
+        sshagent(['Ansible']) {
+                withCredentials([string(credentialsId: 'dockerhub_pw', variable: 'dockerhub_pw')]) {
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker login -u goldenkiwi1324 -p ${dockerhub_pw}"
+                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker image push goldenkiwi1324/$JOB_NAME:v1.$BUILD_ID'
+                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker image push goldenkiwi1324/$JOB_NAME:latest'
+                    
+                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 docker image rm $JOB_NAME:v1.$BUILD_ID goldenkiwi1324/$JOB_NAME:v1.$BUILD_ID '
+            }
+        }
+    }
+     
+    stage('K8s Deployment using Ansible'){
+        sshagent(['Ansible']) {
+            sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.5.110 ansible-playbook /home/pipebox/playbooks/ansible.yml'
+        }
+    }
+    
+}
